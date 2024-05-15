@@ -1,0 +1,29 @@
+name: Build and Test
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  USE_BAZEL_VERSION: "6.3.2"
+
+jobs:
+  Build-And-Test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/intrinsic-dev/intrinsic-dev-img:latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+      - name: Cache Bazel
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84  # v3.3.2
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ env.USE_BAZEL_VERSION }}-${{ hashFiles('.bazelrc', 'WORKSPACE') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+      - name: Update dependencies
+        run: sudo -u vscode "bazel sync"
+      - name: Build And Test
+        run: sudo -v vscode "bazel test --verbose_failures --test_output=errors --nobuild_tests_only //..."
