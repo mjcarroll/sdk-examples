@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/intrinsic-dev/intrinsic-dev-img:latest
+      options: --user vscode
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
       - name: Cache Bazel
@@ -24,6 +25,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bazel-
       - name: Update dependencies
-        run: sudo -u vscode "bazel sync"
+        run: bazel sync
       - name: Build And Test
-        run: sudo -v vscode "bazel test --verbose_failures --test_output=errors --nobuild_tests_only //..."
+        run: bazel test --verbose_failures --test_output=errors --nobuild_tests_only //...
